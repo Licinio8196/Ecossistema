@@ -14,8 +14,27 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 const app = express();
 const server = http.createServer(app);
+const allowedOrigins = (process.env.CORS_ORIGIN || process.env.CLIENT_URL || "http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const corsOptions = {
+  origin(origin, callback) {
+    // Allow server-to-server requests, curl/Postman, and same-origin requests with no Origin header.
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes("*") || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`CORS blocked for origin: ${origin}`));
+  },
+  credentials: true
+};
+
 const io = new Server(server, {
-  cors: { origin: process.env.CLIENT_URL || "http://localhost:5173", credentials: true }
+  cors: corsOptions
 });
 
 const __filename = fileURLToPath(import.meta.url);
@@ -32,7 +51,8 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-app.use(cors({ origin: process.env.CLIENT_URL || "http://localhost:5173", credentials: true }));
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 app.use(express.json({ limit: "10mb" }));
 app.use("/uploads", express.static(uploadsDir));
 

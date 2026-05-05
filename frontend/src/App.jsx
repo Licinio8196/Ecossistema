@@ -259,14 +259,14 @@ async function api(path, options = {}, token) {
 }
 
 function Panel({ children, className = "" }) {
-  return <section className={clsx("min-w-0 rounded-lg border border-white/10 bg-nexus-card shadow-premium", className)}>{children}</section>;
+  return <section className={clsx("rounded-lg border border-white/10 bg-nexus-card shadow-premium", className)}>{children}</section>;
 }
 
 function Button({ children, variant = "primary", className = "", ...props }) {
   return (
     <button
       className={clsx(
-        "inline-flex min-w-0 items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50",
+        "inline-flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50",
         variant === "primary" && "bg-nexus-gold !text-[#07151d] hover:bg-[#e6c981] [&_*]:!text-[#07151d]",
         variant === "ghost" && "border border-white/10 bg-white/5 text-white hover:border-nexus-gold/60",
         variant === "danger" && "border border-red-400/30 bg-red-500/10 text-red-200 hover:bg-red-500/20",
@@ -289,7 +289,7 @@ function Field({ label: fieldLabel, children }) {
 }
 
 const inputClass =
-  "w-full min-w-0 rounded-md border border-white/10 bg-[#0b1c22] px-3 py-2 text-sm text-white outline-none transition placeholder:text-white/35 focus:border-nexus-gold/70";
+  "w-full rounded-md border border-white/10 bg-[#0b1c22] px-3 py-2 text-sm text-white outline-none transition placeholder:text-white/35 focus:border-nexus-gold/70";
 
 function TextInput({ className = "", ...props }) {
   return <input className={clsx(inputClass, className)} {...props} />;
@@ -309,15 +309,15 @@ function TextArea({ className = "", ...props }) {
 
 function Modal({ title, children, onClose }) {
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-2 sm:p-4">
-      <div className="max-h-[94vh] w-full max-w-4xl overflow-auto rounded-lg border border-nexus-gold/30 bg-[#07151d] shadow-premium">
-        <div className="sticky top-0 flex items-center justify-between gap-3 border-b border-white/10 bg-[#07151d] px-3 py-3 sm:px-5 sm:py-4">
-          <h2 className="min-w-0 truncate text-base font-semibold text-white sm:text-lg">{title}</h2>
-          <Button variant="ghost" className="shrink-0" onClick={onClose}>
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4">
+      <div className="max-h-[92vh] w-full max-w-4xl overflow-auto rounded-lg border border-nexus-gold/30 bg-[#07151d] shadow-premium">
+        <div className="sticky top-0 flex items-center justify-between border-b border-white/10 bg-[#07151d] px-5 py-4">
+          <h2 className="text-lg font-semibold text-white">{title}</h2>
+          <Button variant="ghost" onClick={onClose}>
             Fechar
           </Button>
         </div>
-        <div className="p-3 sm:p-5">{children}</div>
+        <div className="p-5">{children}</div>
       </div>
     </div>
   );
@@ -363,14 +363,14 @@ function AuthScreen({ onLogin }) {
   }
 
   return (
-    <main className="min-h-screen bg-[#07151d] p-4 text-white sm:p-6">
-      <div className="mx-auto grid min-h-[calc(100vh-32px)] max-w-6xl items-center gap-6 lg:min-h-[calc(100vh-48px)] lg:grid-cols-[1fr_420px]">
+    <main className="min-h-screen bg-[#07151d] p-6 text-white">
+      <div className="mx-auto grid min-h-[calc(100vh-48px)] max-w-6xl items-center gap-6 lg:grid-cols-[1fr_420px]">
         <div>
           <div className="mb-5 inline-flex items-center gap-3 rounded-md border border-nexus-gold/30 bg-white/5 px-4 py-3 text-nexus-gold">
             <ShieldCheck size={18} /> RESIMOVEL Nexus privado
           </div>
-          <h1 className="max-w-3xl text-3xl font-semibold leading-tight sm:text-4xl lg:text-5xl">Rede social profissional imobiliaria para quem trabalha negocio todos os dias.</h1>
-          <p className="mt-5 max-w-2xl text-base text-nexus-muted sm:text-lg">Entre na sua area profissional e colabore com outros especialistas do mercado imobiliario.</p>
+          <h1 className="max-w-3xl text-5xl font-semibold leading-tight">Rede social profissional imobiliaria para quem trabalha negocio todos os dias.</h1>
+          <p className="mt-5 max-w-2xl text-lg text-nexus-muted">Entre na sua area profissional e colabore com outros especialistas do mercado imobiliario.</p>
         </div>
         <Panel className="p-5">
           <form onSubmit={submit} className="grid gap-4">
@@ -729,9 +729,9 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#07151d] text-white">
+    <div className="min-h-screen bg-[#07151d] text-white">
       <Header me={me} view={view} setView={setView} logout={logout} notifications={notifications} setModal={setModal} searchTerm={searchTerm} setSearchTerm={setSearchTerm} readNotification={readNotification} />
-      <main className="mx-auto grid w-full max-w-[1480px] gap-4 px-3 pb-24 pt-4 sm:px-4 sm:py-5">
+      <main className="mx-auto grid w-full max-w-[1480px] gap-5 px-4 py-5">
         {view === "feed" && (
           <FeedPage
             me={me}
@@ -833,15 +833,15 @@ function Header({ me, view, setView, logout, notifications, setModal, searchTerm
 
   return (
     <header className="sticky top-0 z-40 border-b border-nexus-gold/20 bg-[#07151d]/95 backdrop-blur">
-      <div className="mx-auto flex max-w-[1480px] items-center gap-2 px-3 py-2.5 sm:px-4 lg:gap-3 lg:py-3">
-        <button onClick={() => setView("feed")} className="flex shrink-0 items-center gap-2 sm:gap-3">
-          <span className="grid h-9 w-9 place-items-center rounded-md bg-nexus-gold text-lg font-black text-[#07151d] sm:h-10 sm:w-10 sm:text-xl">R</span>
-          <span className="hidden text-left md:block">
-            <span className="block text-lg font-semibold tracking-normal xl:text-xl">RESIMOVEL Nexus</span>
+      <div className="mx-auto flex max-w-[1480px] items-center gap-3 px-4 py-3">
+        <button onClick={() => setView("feed")} className="flex items-center gap-3">
+          <span className="grid h-10 w-10 place-items-center rounded-md bg-nexus-gold text-xl font-black text-[#07151d]">R</span>
+          <span className="hidden text-left sm:block">
+            <span className="block text-xl font-semibold tracking-normal">RESIMOVEL Nexus</span>
             <span className="block text-[10px] uppercase tracking-[0.22em] text-nexus-gold">Rede profissional imobiliaria</span>
           </span>
         </button>
-        <div className="hidden w-[28vw] max-w-[340px] flex-none items-center gap-2 rounded-md border border-white/10 bg-white/5 px-3 py-2 text-nexus-muted 2xl:flex">
+        <div className="hidden w-[340px] flex-none items-center gap-2 rounded-md border border-white/10 bg-white/5 px-3 py-2 text-nexus-muted 2xl:flex">
           <Search size={16} />
           <input
             className="w-full bg-transparent text-sm outline-none placeholder:text-white/35"
@@ -853,13 +853,13 @@ function Header({ me, view, setView, logout, notifications, setModal, searchTerm
             placeholder="Pesquisar nome ou ID"
           />
         </div>
-        <nav className="scrollbar-soft flex min-w-0 flex-1 justify-start gap-1 overflow-x-auto lg:justify-center">
+        <nav className="flex min-w-0 flex-1 justify-end gap-1 overflow-x-auto lg:justify-center">
           {navItems.map(([key, text, Icon]) => (
             <button
               key={key}
               onClick={() => setView(key)}
               className={clsx(
-                "flex shrink-0 items-center gap-2 rounded-md px-2.5 py-2 text-sm transition lg:px-3",
+                "flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm transition",
                 view === key
                   ? "bg-nexus-gold !text-[#07151d] hover:bg-nexus-gold hover:!text-[#07151d] [&_*]:!text-[#07151d]"
                   : "text-nexus-muted hover:bg-white/5 hover:text-white"
@@ -869,10 +869,10 @@ function Header({ me, view, setView, logout, notifications, setModal, searchTerm
             </button>
           ))}
         </nav>
-        <Button onClick={() => setModal("request")} className="hidden shrink-0 lg:inline-flex">
+        <Button onClick={() => setModal("request")} className="hidden md:inline-flex">
           <Plus size={16} /> Criar pedido
         </Button>
-        <div className="relative shrink-0">
+        <div className="relative">
           <button
             onClick={() => setShowNotifications((value) => !value)}
             className="relative rounded-md border border-white/10 bg-white/5 p-2 text-nexus-gold hover:border-nexus-gold/60"
@@ -886,7 +886,7 @@ function Header({ me, view, setView, logout, notifications, setModal, searchTerm
             )}
           </button>
           {showNotifications && (
-            <Panel className="absolute right-0 top-12 z-50 w-[calc(100vw-24px)] max-w-[340px] overflow-hidden">
+            <Panel className="absolute right-0 top-12 z-50 w-[340px] overflow-hidden">
               <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
                 <b>Notificacoes</b>
                 <span className="text-xs text-nexus-muted">{unreadCount} nova(s)</span>
@@ -920,13 +920,13 @@ function Header({ me, view, setView, logout, notifications, setModal, searchTerm
           onClick={() => setView("profile")}
           title="Perfil"
           className={clsx(
-            "shrink-0 rounded-full p-0.5 transition hover:ring-2 hover:ring-nexus-gold/70",
+            "rounded-full p-0.5 transition hover:ring-2 hover:ring-nexus-gold/70",
             view === "profile" && "ring-2 ring-nexus-gold"
           )}
         >
           <Avatar user={me} />
         </button>
-        <button onClick={logout} className="inline-flex shrink-0 rounded-md border border-white/10 bg-white/5 p-2 text-nexus-muted hover:text-white">
+        <button onClick={logout} className="rounded-md border border-white/10 bg-white/5 p-2 text-nexus-muted hover:text-white">
           <LogOut size={18} />
         </button>
       </div>
@@ -940,8 +940,8 @@ function FeedPage(props) {
   const filtered = posts.filter((post) => (!typeFilter || post.type === typeFilter) && postMatchesSearch(post, searchTerm));
 
   return (
-    <div className="grid min-w-0 items-start gap-4 xl:grid-cols-[280px_minmax(0,1fr)_320px] xl:gap-5">
-      <aside className="order-2 grid min-w-0 content-start gap-4 xl:order-1 xl:sticky xl:top-24">
+    <div className="grid items-start gap-5 xl:grid-cols-[280px_minmax(0,1fr)_320px]">
+      <aside className="grid content-start gap-4 xl:sticky xl:top-24">
         <Panel className="overflow-hidden">
           <div className="h-28 bg-gradient-to-r from-[#0f2a32] to-[#2d3b3a]">
             {me.profile?.coverPhoto && <img src={mediaUrl(me.profile.coverPhoto)} alt="" className="h-full w-full object-cover" />}
@@ -977,7 +977,7 @@ function FeedPage(props) {
           </div>
         </Panel>
       </aside>
-      <section className="order-1 grid min-w-0 content-start gap-4 xl:order-2">
+      <section className="grid content-start gap-4">
         <CreatePostBox onSubmit={createPost} />
         <div className="grid content-start gap-4">
           {searchTerm && (
@@ -988,7 +988,7 @@ function FeedPage(props) {
           {filtered.map((post) => <PostCard key={post.id} post={post} {...props} />)}
         </div>
       </section>
-      <aside className="order-3 grid min-w-0 content-start gap-4 xl:sticky xl:top-24">
+      <aside className="grid content-start gap-4 xl:sticky xl:top-24">
         <Panel className="p-4">
           <h3 className="mb-3 font-semibold">Pessoas online</h3>
           <div className="grid gap-3">
@@ -1037,16 +1037,16 @@ function CreatePostBox({ onSubmit }) {
   }
 
   return (
-    <Panel className="p-3 sm:p-4">
+    <Panel className="p-4">
       <form onSubmit={submit} className="grid gap-3">
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-3 md:grid-cols-2">
           <SelectInput value={form.type} onChange={(event) => setForm({ ...form, type: event.target.value })}>
             {postTypes.map(([key, text]) => <option key={key} value={key}>{text}</option>)}
           </SelectInput>
           <TextInput placeholder="Titulo da publicacao" value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} required />
         </div>
         <TextArea placeholder="Descreva a oportunidade, imovel, pedido ou parceria" value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} required />
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 md:grid-cols-4">
           <TextInput placeholder="Localizacao" value={form.location} onChange={(event) => setForm({ ...form, location: event.target.value })} />
           <TextInput placeholder="Preco" type="number" value={form.price} onChange={(event) => setForm({ ...form, price: event.target.value })} />
           <SelectInput value={form.propertyType} onChange={(event) => setForm({ ...form, propertyType: event.target.value })}>
@@ -1056,12 +1056,12 @@ function CreatePostBox({ onSubmit }) {
             {businessTypes.map(([key, text]) => <option key={key} value={key}>{text}</option>)}
           </SelectInput>
         </div>
-        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-nexus-muted">
             <ImagePlus size={16} /> Imagens
             <input type="file" multiple className="hidden" onChange={(event) => setForm({ ...form, images: event.target.files })} />
           </label>
-          <Button type="submit" className="w-full sm:w-auto"><Send size={16} /> Publicar</Button>
+          <Button type="submit"><Send size={16} /> Publicar</Button>
         </div>
       </form>
     </Panel>
@@ -1107,7 +1107,7 @@ function PostCard({ post, me, commentPost, savePost, editPost, deletePost, start
         </div>
 
         {!!post.images?.length && (
-          <div className="mt-3 grid max-w-xs grid-cols-3 gap-2 sm:max-w-sm sm:grid-cols-4 md:max-w-md">
+          <div className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-5 md:max-w-md">
             {post.images.slice(0, 4).map((image, index) => (
               <button
                 key={image}
@@ -1123,7 +1123,7 @@ function PostCard({ post, me, commentPost, savePost, editPost, deletePost, start
           </div>
         )}
 
-        <div className="mt-3 grid gap-2 rounded-md border border-white/10 bg-[#0b1c22] p-2.5 text-sm sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-3 grid gap-2 rounded-md border border-white/10 bg-[#0b1c22] p-2.5 text-sm md:grid-cols-4">
           <InfoPill label="Localizacao" value={post.location || "Sem localizacao"} />
           <InfoPill label={requestLike ? "Orcamento" : "Preco"} value={money(post.price)} highlight />
           <InfoPill label="Tipo" value={label(propertyTypes, post.propertyType)} />
@@ -1138,8 +1138,8 @@ function PostCard({ post, me, commentPost, savePost, editPost, deletePost, start
           </div>
         )}
 
-        <div className="mt-3 grid gap-2 border-t border-white/10 pt-3 sm:flex sm:flex-wrap sm:items-center sm:justify-between">
-          <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-white/10 pt-3">
+          <div className="flex flex-wrap gap-2">
             <button className="inline-flex items-center gap-2 rounded-md px-2.5 py-1.5 text-sm font-semibold text-nexus-muted hover:bg-white/5 hover:text-white" onClick={() => commentPost(post)}><MessageSquare size={15} /> Comentar</button>
             <button className="inline-flex items-center gap-2 rounded-md px-2.5 py-1.5 text-sm font-semibold text-nexus-muted hover:bg-white/5 hover:text-white" onClick={() => startConversation(post.authorId, { relatedPostId: post.id }, "floating")}><Send size={15} /> Contactar</button>
             <button className="inline-flex items-center gap-2 rounded-md px-2.5 py-1.5 text-sm font-semibold text-nexus-muted hover:bg-white/5 hover:text-white" onClick={() => requestLike ? replyToRequest({ id: post.requestId, authorId: post.authorId }) : setModal({ type: "deal", seed: { propertyPostId: post.id } })}><Handshake size={15} /> Tenho opcao</button>
@@ -1147,7 +1147,7 @@ function PostCard({ post, me, commentPost, savePost, editPost, deletePost, start
             <button className="inline-flex items-center gap-2 rounded-md px-2.5 py-1.5 text-sm font-semibold text-nexus-muted hover:bg-white/5 hover:text-white" onClick={() => navigator.clipboard?.writeText(window.location.href)}><Share2 size={15} /> Partilhar</button>
           </div>
           {canEditPost && (
-            <div className="grid grid-cols-2 gap-2 sm:flex">
+            <div className="flex gap-2">
               <button className="inline-flex items-center gap-2 rounded-md px-2.5 py-1.5 text-sm font-semibold text-nexus-muted hover:bg-white/5 hover:text-white" onClick={() => editPost(post)}><Edit3 size={15} /> Editar</button>
               <button className="inline-flex items-center gap-2 rounded-md px-2.5 py-1.5 text-sm font-semibold text-red-200 hover:bg-red-500/10" onClick={() => deletePost(post)}><Trash2 size={15} /> Apagar</button>
             </div>
@@ -1179,15 +1179,15 @@ function RequestsPage({ requests, setModal, startConversation, replyToRequest, s
   });
 
   return (
-    <div className="grid gap-4 sm:gap-5">
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
-        <div className="min-w-0">
-          <h1 className="text-xl font-semibold sm:text-2xl">Pedidos de clientes</h1>
+    <div className="grid gap-5">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold">Pedidos de clientes</h1>
           <p className="text-nexus-muted">Filtre, responda com imovel, abra chat ou converta em deal room.</p>
         </div>
-        <Button onClick={() => setModal("request")} className="w-full sm:w-auto"><Plus size={16} /> Criar pedido</Button>
+        <Button onClick={() => setModal("request")}><Plus size={16} /> Criar pedido</Button>
       </div>
-      <Panel className="grid gap-3 p-3 sm:grid-cols-2 sm:p-4 lg:grid-cols-5">
+      <Panel className="grid gap-3 p-4 md:grid-cols-5">
         <TextInput placeholder="Localizacao" value={filters.location} onChange={(event) => setFilters({ ...filters, location: event.target.value })} />
         <SelectInput value={filters.propertyType} onChange={(event) => setFilters({ ...filters, propertyType: event.target.value })}>
           <option value="">Tipo de imovel</option>
@@ -1207,13 +1207,13 @@ function RequestsPage({ requests, setModal, startConversation, replyToRequest, s
       <div className="grid gap-4 lg:grid-cols-2">
         {filtered.map((request) => (
           <Panel key={request.id} className="grid gap-4 p-4">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-              <div className="min-w-0">
+            <div className="flex items-start justify-between gap-3">
+              <div>
                 <div className="text-xs uppercase tracking-wide text-nexus-gold">{label(urgencies, request.urgency)} · {request.clientValidated ? "Cliente validado" : "Por validar"}</div>
                 <h2 className="mt-1 text-xl font-semibold">{label(propertyTypes, request.propertyType)} em {request.location}</h2>
                 <p className="mt-1 text-sm text-nexus-muted">{request.description}</p>
               </div>
-              <div className="shrink-0 text-sm font-semibold text-nexus-gold sm:text-right">{money(request.budgetMin)} - {money(request.budgetMax)}</div>
+              <div className="text-right text-sm font-semibold text-nexus-gold">{money(request.budgetMin)} - {money(request.budgetMax)}</div>
             </div>
             <div className="flex flex-wrap gap-2 text-xs">
               <span className={clsx("rounded border px-2 py-1", businessClass(request.businessType))}>{label(businessTypes, request.businessType)}</span>
@@ -1221,7 +1221,7 @@ function RequestsPage({ requests, setModal, startConversation, replyToRequest, s
               <span className="rounded bg-white/5 px-2 py-1">{request.bathrooms || 0} WC</span>
               <span className="rounded bg-white/5 px-2 py-1">{shortDate(request.createdAt)}</span>
             </div>
-            <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="grid gap-2 sm:grid-cols-4">
               <Button variant="ghost" onClick={() => replyToRequest(request)}><Building2 size={15} /> Responder</Button>
               <Button variant="ghost" onClick={() => startConversation(request.authorId, { relatedRequestId: request.id }, "floating")}><MessageSquare size={15} /> Chat</Button>
               <Button variant="ghost" onClick={() => setModal({ type: "deal", seed: { requestId: request.id, buyerClient: request.author?.name } })}><BriefcaseBusiness size={15} /> Deal room</Button>
@@ -1241,24 +1241,24 @@ function ProfilePage({ me, posts, requests, dealRooms, setModal, editPost, delet
   const visiblePosts = ownPosts.filter((post) => postMatchesSearch(post, activeQuery));
   const ownRequests = requests.filter((request) => request.authorId === me.id);
   return (
-    <div className="grid gap-4 sm:gap-5">
+    <div className="grid gap-5">
       <Panel className="overflow-hidden">
-        <div className="h-32 bg-gradient-to-r from-[#0e2930] via-[#142f35] to-[#443a25] sm:h-44">
+        <div className="h-44 bg-gradient-to-r from-[#0e2930] via-[#142f35] to-[#443a25]">
           {me.profile?.coverPhoto && <img src={mediaUrl(me.profile.coverPhoto)} alt="" className="h-full w-full object-cover" />}
         </div>
-        <div className="-mt-10 grid gap-4 p-4 sm:p-5 lg:grid-cols-[1fr_auto]">
-          <div className="flex min-w-0 flex-wrap items-end gap-4">
+        <div className="-mt-10 grid gap-4 p-5 lg:grid-cols-[1fr_auto]">
+          <div className="flex flex-wrap items-end gap-4">
             <Avatar user={me} size="lg" />
-            <div className="min-w-0">
-              <h1 className="truncate text-2xl font-semibold sm:text-3xl">{me.name}</h1>
+            <div>
+              <h1 className="text-3xl font-semibold">{me.name}</h1>
               <p className="text-nexus-muted">{me.profile?.company} · {me.profile?.location} · {label([["PROFESSIONAL", "Profissional"], ["PREMIUM", "Premium"], ["ADMIN", "Admin"]], me.role)}</p>
               <p className="mt-1 font-mono text-xs text-nexus-gold">ID utilizador: {me.id}</p>
             </div>
           </div>
-          <Button onClick={() => setModal("profile")} className="w-full sm:w-auto"><Edit3 size={16} /> Editar perfil</Button>
+          <Button onClick={() => setModal("profile")}><Edit3 size={16} /> Editar perfil</Button>
         </div>
       </Panel>
-      <div className="grid gap-4 lg:grid-cols-[minmax(280px,360px)_minmax(0,1fr)] lg:gap-5">
+      <div className="grid gap-5 lg:grid-cols-[360px_1fr]">
         <aside className="grid h-fit gap-4">
           <Panel className="grid gap-3 p-4">
             <h2 className="font-semibold">Sobre</h2>
@@ -1277,7 +1277,7 @@ function ProfilePage({ me, posts, requests, dealRooms, setModal, editPost, delet
         </aside>
         <section className="grid gap-4">
           <Panel className="p-4">
-            <div className="mb-4 grid gap-3 lg:grid-cols-[1fr_minmax(240px,320px)] lg:items-center">
+            <div className="mb-4 grid gap-3 lg:grid-cols-[1fr_320px] lg:items-center">
               <div>
                 <h2 className="font-semibold">Publicacoes do utilizador</h2>
                 <p className="text-xs text-nexus-muted">Pesquise por nome, ID do utilizador ou ID da publicacao.</p>
@@ -1301,7 +1301,7 @@ function ProfilePage({ me, posts, requests, dealRooms, setModal, editPost, delet
           </Panel>
           <Panel className="p-4">
             <h2 className="mb-3 font-semibold">Pedidos, imoveis e deal rooms ativos</h2>
-            <div className="grid gap-3 sm:grid-cols-3">
+            <div className="grid gap-3 lg:grid-cols-3">
               <Metric icon={FileText} label="Pedidos criados" value={ownRequests.length} />
               <Metric icon={Building2} label="Imoveis publicados" value={ownPosts.filter((post) => post.type === "PROPERTY").length} />
               <Metric icon={BriefcaseBusiness} label="Deal rooms ativos" value={dealRooms.filter((room) => !["CLOSED", "LOST"].includes(room.status)).length} />
@@ -1316,7 +1316,7 @@ function ProfilePage({ me, posts, requests, dealRooms, setModal, editPost, delet
 function ProfilePostCard({ post, me, editPost, deletePost, openGallery }) {
   return (
     <article className="rounded-md border border-white/10 bg-white/5 p-3 transition hover:border-nexus-gold/35">
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="text-lg font-semibold leading-tight">{post.title || "Publicacao sem titulo"}</h3>
@@ -1329,14 +1329,14 @@ function ProfilePostCard({ post, me, editPost, deletePost, openGallery }) {
             <span className="rounded bg-black/20 px-2 py-1" title={me.id}>ID utilizador: {shortId(me.id)}</span>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-2 sm:flex">
+        <div className="flex gap-2">
           <Button variant="ghost" onClick={() => editPost(post)}><Edit3 size={15} /> Editar</Button>
           <Button variant="danger" onClick={() => deletePost(post)}><Trash2 size={15} /> Apagar</Button>
         </div>
       </div>
 
       {!!post.images?.length && (
-        <div className="mt-3 grid max-w-xs grid-cols-3 gap-2 sm:max-w-sm sm:grid-cols-4">
+        <div className="mt-3 grid max-w-sm grid-cols-4 gap-2">
           {post.images.slice(0, 4).map((image, index) => (
             <button
               key={`${post.id}-${image}-${index}`}
@@ -1352,7 +1352,7 @@ function ProfilePostCard({ post, me, editPost, deletePost, openGallery }) {
         </div>
       )}
 
-      <div className="mt-3 grid gap-2 rounded-md border border-white/10 bg-[#0b1c22] p-2.5 text-sm sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-3 grid gap-2 rounded-md border border-white/10 bg-[#0b1c22] p-2.5 text-sm md:grid-cols-4">
         <InfoPill label="Localizacao" value={post.location || "Sem localizacao"} />
         <InfoPill label="Preco" value={money(post.price)} highlight />
         <InfoPill label="Tipo" value={label(propertyTypes, post.propertyType)} />
@@ -1363,7 +1363,7 @@ function ProfilePostCard({ post, me, editPost, deletePost, openGallery }) {
 }
 
 function InfoLine({ label: title, value }) {
-  return <div className="flex flex-col gap-1 border-t border-white/10 pt-2 text-sm sm:flex-row sm:justify-between sm:gap-3"><span className="text-nexus-muted">{title}</span><span className="break-words sm:text-right">{value || "-"}</span></div>;
+  return <div className="flex justify-between gap-3 border-t border-white/10 pt-2 text-sm"><span className="text-nexus-muted">{title}</span><span>{value || "-"}</span></div>;
 }
 
 function Metric({ icon: Icon, label: title, value }) {
@@ -1396,7 +1396,7 @@ function MessagesPage({ me, conversations, activeConversation, setActiveConversa
   }
 
   return (
-    <div className="grid min-h-[calc(100vh-120px)] gap-4 lg:grid-cols-[minmax(260px,320px)_minmax(0,1fr)_minmax(240px,300px)]">
+    <div className="grid min-h-[calc(100vh-120px)] gap-4 lg:grid-cols-[320px_1fr_300px]">
       <Panel className="overflow-hidden">
         <div className="border-b border-white/10 p-4">
           <h1 className="font-semibold">Mensagens</h1>
@@ -1416,16 +1416,16 @@ function MessagesPage({ me, conversations, activeConversation, setActiveConversa
           })}
         </div>
       </Panel>
-      <Panel className="flex min-h-[60vh] flex-col overflow-hidden lg:min-h-[70vh]">
+      <Panel className="flex min-h-[70vh] flex-col overflow-hidden">
         {activeConversation ? (
           <>
-            <div className="flex min-w-0 items-center gap-3 border-b border-white/10 p-3 sm:p-4">
+            <div className="flex items-center gap-3 border-b border-white/10 p-4">
               <Avatar user={other} />
-              <div className="min-w-0"><b className="block truncate">{other?.name}</b><p className="truncate text-xs text-nexus-muted">{other?.isOnline ? "Online" : "Offline"} · digitando aparece em tempo real via Socket.io</p></div>
+              <div><b>{other?.name}</b><p className="text-xs text-nexus-muted">{other?.isOnline ? "Online" : "Offline"} · digitando aparece em tempo real via Socket.io</p></div>
             </div>
-            <div className="scrollbar-soft flex-1 space-y-3 overflow-auto p-3 sm:p-4">
+            <div className="scrollbar-soft flex-1 space-y-3 overflow-auto p-4">
               {activeConversation.messages?.map((message) => (
-                <div key={message.id} className={clsx("max-w-[88%] rounded-md p-3 text-sm sm:max-w-[78%]", message.senderId === me.id ? "ml-auto bg-nexus-gold text-[#07151d]" : "bg-white/5")}>
+                <div key={message.id} className={clsx("max-w-[78%] rounded-md p-3 text-sm", message.senderId === me.id ? "ml-auto bg-nexus-gold text-[#07151d]" : "bg-white/5")}>
                   {message.body && <p>{message.body}</p>}
                   {!!message.attachments?.length && <MessageAttachments attachments={message.attachments} mine={message.senderId === me.id} />}
                   <span className="mt-1 block text-[11px] opacity-70">{shortDate(message.createdAt)} {message.readAt ? "· lida" : ""}</span>
@@ -1438,7 +1438,7 @@ function MessagesPage({ me, conversations, activeConversation, setActiveConversa
                 {files.length} anexo(s) selecionado(s): {[...files].map((file) => file.name).join(", ")}
               </div>
             )}
-            <form onSubmit={submit} className="grid gap-2 border-t border-white/10 p-3 sm:flex">
+            <form onSubmit={submit} className="flex gap-2 border-t border-white/10 p-3">
               <label className="grid cursor-pointer place-items-center rounded-md border border-white/10 bg-white/5 px-3" title="Anexar fotos ou documentos"><Upload size={16} /><input type="file" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt" className="hidden" onChange={(event) => setFiles(event.target.files)} /></label>
               <TextInput placeholder="Escreva uma mensagem" value={body} onChange={(event) => setBody(event.target.value)} />
               <Button disabled={!body && !files?.length}><Send size={16} /></Button>
@@ -1446,7 +1446,7 @@ function MessagesPage({ me, conversations, activeConversation, setActiveConversa
           </>
         ) : <div className="grid flex-1 place-items-center text-nexus-muted">Escolha uma conversa</div>}
       </Panel>
-      <Panel className="h-fit p-4 lg:block">
+      <Panel className="h-fit p-4">
         <h2 className="mb-3 font-semibold">Dados associados</h2>
         {other && (
           <div className="grid gap-3 text-sm">
@@ -1482,7 +1482,7 @@ function MessageAttachments({ attachments, mine = false }) {
             )}
           >
             {isImageUrl(url) ? (
-              <img src={href} alt={name || "Anexo"} className="max-h-44 w-full object-cover sm:max-h-56" />
+              <img src={href} alt={name || "Anexo"} className="max-h-56 w-full object-cover" />
             ) : (
               <span className="block p-2">{name || "Documento anexado"}</span>
             )}
@@ -1577,7 +1577,6 @@ function FloatingChat({ me, users, onlineUsers, conversations, floatingChat, set
     setNewMessageOpen(true);
     setShowOptions(false);
     setManageMode(false);
-    setFloatingChat((state) => (state ? { ...state, minimized: true } : state));
   }
 
   function startNewConversation(userId) {
@@ -1599,9 +1598,9 @@ function FloatingChat({ me, users, onlineUsers, conversations, floatingChat, set
   }
 
   return (
-    <div className="fixed bottom-0 right-2 z-50 flex max-w-[calc(100vw-16px)] items-end gap-2 text-[#1f1f1f] sm:right-3 sm:max-w-[calc(100vw-24px)]">
+    <div className="fixed bottom-0 right-3 z-50 flex max-w-[calc(100vw-24px)] items-end gap-2 text-[#1f1f1f]">
       {newMessageOpen && (
-        <section className="absolute bottom-[42px] right-0 flex h-[calc(100vh-96px)] max-h-[500px] w-[calc(100vw-16px)] flex-col overflow-hidden rounded-t-lg border border-[#d8d3c8] bg-white shadow-[0_2px_18px_rgba(0,0,0,.22)] sm:w-[360px] md:static md:h-[500px]">
+        <section className="hidden h-[500px] w-[360px] overflow-hidden rounded-t-lg border border-[#d8d3c8] bg-white shadow-[0_2px_18px_rgba(0,0,0,.22)] md:flex md:flex-col">
           <div className="flex h-11 items-center justify-between border-b border-[#e6e2dc] px-3">
             <b className="text-sm">Nova mensagem</b>
             <div className="flex items-center gap-2">
@@ -1638,7 +1637,7 @@ function FloatingChat({ me, users, onlineUsers, conversations, floatingChat, set
       )}
 
       {isChatOpen && (
-        <section className="absolute bottom-[42px] right-0 flex h-[calc(100vh-96px)] max-h-[500px] w-[calc(100vw-16px)] flex-col overflow-hidden rounded-t-lg border border-[#d8d3c8] bg-white shadow-[0_2px_18px_rgba(0,0,0,.22)] sm:w-[360px] md:static md:h-[500px]">
+        <section className="hidden h-[500px] w-[360px] overflow-hidden rounded-t-lg border border-[#d8d3c8] bg-white shadow-[0_2px_18px_rgba(0,0,0,.22)] md:flex md:flex-col">
           <div className="flex h-11 items-center gap-2 border-b border-[#e6e2dc] px-3">
             <span className="relative">
               <Avatar user={person} size="sm" />
@@ -1703,7 +1702,7 @@ function FloatingChat({ me, users, onlineUsers, conversations, floatingChat, set
         </section>
       )}
 
-      <section className="relative w-[260px] max-w-[calc(100vw-16px)] overflow-visible rounded-t-lg border border-[#d8d3c8] bg-white shadow-[0_2px_18px_rgba(0,0,0,.22)] sm:w-[270px]">
+      <section className="relative w-[270px] max-w-[calc(100vw-24px)] overflow-visible rounded-t-lg border border-[#d8d3c8] bg-white shadow-[0_2px_18px_rgba(0,0,0,.22)]">
         <div className="flex h-10 items-center gap-2 px-2.5">
           <button onClick={openDock} className="relative shrink-0">
             <Avatar user={dockUser} size="sm" />
@@ -1723,7 +1722,7 @@ function FloatingChat({ me, users, onlineUsers, conversations, floatingChat, set
           </button>
         </div>
         {showOptions && (
-          <div className="absolute bottom-[42px] right-0 z-20 w-[260px] max-w-[calc(100vw-16px)] rounded-t-lg border border-[#d8d3c8] bg-white py-1.5 shadow-[0_2px_18px_rgba(0,0,0,.22)] sm:w-[270px]">
+          <div className="absolute bottom-[42px] right-0 z-20 w-[270px] rounded-t-lg border border-[#d8d3c8] bg-white py-1.5 shadow-[0_2px_18px_rgba(0,0,0,.22)]">
             <button onClick={openManageMode} className="block w-full px-3 py-2 text-left text-sm hover:bg-[#f3f2ef]">Gerenciar conversas</button>
             <button onClick={() => setView("messages")} className="block w-full px-3 py-2 text-left text-sm hover:bg-[#f3f2ef]">Abrir caixa de mensagens</button>
             <button className="block w-full px-3 py-2 text-left text-sm hover:bg-[#f3f2ef]">Configurações de mensagens</button>
@@ -1749,7 +1748,7 @@ function FloatingChat({ me, users, onlineUsers, conversations, floatingChat, set
                 </div>
               </div>
             )}
-            <div className="scrollbar-soft max-h-[55vh] overflow-auto sm:max-h-[330px]">
+            <div className="scrollbar-soft max-h-[330px] overflow-auto">
               {visibleConversations.map((item) => {
                 const other = otherUser(item);
                 const last = item.messages?.[item.messages.length - 1];
@@ -1807,18 +1806,18 @@ function UserProfileModal({ user, posts, requests, onClose, onContact, onConnect
     <Modal title="Perfil profissional" onClose={onClose}>
       <div className="grid gap-5">
         <div className="overflow-hidden rounded-lg border border-white/10">
-          <div className="h-28 bg-gradient-to-r from-[#0e2930] via-[#142f35] to-[#443a25] sm:h-36">
+          <div className="h-36 bg-gradient-to-r from-[#0e2930] via-[#142f35] to-[#443a25]">
             {user.profile?.coverPhoto && <img src={mediaUrl(user.profile.coverPhoto)} alt="" className="h-full w-full object-cover" />}
           </div>
-          <div className="-mt-8 flex flex-col gap-4 p-4 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
-            <div className="flex min-w-0 items-end gap-3 sm:gap-4">
+          <div className="-mt-8 flex flex-wrap items-end justify-between gap-4 p-4">
+            <div className="flex items-end gap-4">
               <Avatar user={user} size="lg" />
-              <div className="min-w-0">
-                <h2 className="truncate text-xl font-semibold sm:text-2xl">{user.name}</h2>
+              <div>
+                <h2 className="text-2xl font-semibold">{user.name}</h2>
                 <p className="text-sm text-nexus-muted">{user.profile?.company} · {user.profile?.location}</p>
               </div>
             </div>
-            <div className="relative grid gap-2 sm:flex sm:flex-wrap">
+            <div className="relative flex flex-wrap gap-2">
               {!isMe && (
                 <button
                   onClick={() => onConnect(user.id)}
@@ -1860,7 +1859,7 @@ function UserProfileModal({ user, posts, requests, onClose, onContact, onConnect
             </div>
           </div>
         </div>
-        <div className="grid gap-4 lg:grid-cols-[minmax(260px,320px)_minmax(0,1fr)]">
+        <div className="grid gap-4 lg:grid-cols-[320px_1fr]">
           <Panel className="grid gap-3 p-4">
             <p className="text-sm text-nexus-muted">{user.profile?.bio || "Sem bio profissional."}</p>
             <InfoLine label="Avaliacao" value={`${user.profile?.rating || 4.8}/5`} />
@@ -1926,11 +1925,11 @@ function ImageGalleryModal({ gallery, setGallery }) {
           </button>
         </div>
 
-        <div className="relative grid min-h-[260px] place-items-center bg-black/35 sm:min-h-[540px]">
+        <div className="relative grid min-h-[320px] place-items-center bg-black/35 sm:min-h-[540px]">
           {images.length > 1 && (
             <button
               onClick={() => move(-1)}
-              className="absolute left-2 top-1/2 z-10 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-white/10 bg-black/45 text-2xl text-white hover:bg-black/65 sm:left-3 sm:h-11 sm:w-11"
+              className="absolute left-3 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-white/10 bg-black/45 text-2xl text-white hover:bg-black/65"
             >
               &lsaquo;
             </button>
@@ -1939,7 +1938,7 @@ function ImageGalleryModal({ gallery, setGallery }) {
           {images.length > 1 && (
             <button
               onClick={() => move(1)}
-              className="absolute right-2 top-1/2 z-10 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-white/10 bg-black/45 text-2xl text-white hover:bg-black/65 sm:right-3 sm:h-11 sm:w-11"
+              className="absolute right-3 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-white/10 bg-black/45 text-2xl text-white hover:bg-black/65"
             >
               &rsaquo;
             </button>
@@ -1967,7 +1966,7 @@ function ImageGalleryModal({ gallery, setGallery }) {
 function DealRoomsPage({ rooms, activeRoom, users, requests, posts, setActiveDealRoomId, setModal, sendDealMessage, addDealTask, updateDealStatus, closeDeal }) {
   const [message, setMessage] = useState("");
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(280px,340px)_minmax(0,1fr)]">
+    <div className="grid gap-4 lg:grid-cols-[340px_1fr]">
       <Panel className="h-fit p-4">
         <div className="mb-4 flex items-center justify-between">
           <h1 className="font-semibold">Deal rooms</h1>
@@ -1988,7 +1987,7 @@ function DealRoomsPage({ rooms, activeRoom, users, requests, posts, setActiveDea
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <div className="text-xs uppercase tracking-wide text-nexus-gold">{label(businessTypes, activeRoom.businessType)} · {activeRoom.status}</div>
-                <h1 className="text-xl font-semibold sm:text-2xl">{activeRoom.title}</h1>
+                <h1 className="text-2xl font-semibold">{activeRoom.title}</h1>
                 <p className="text-nexus-muted">{activeRoom.observations}</p>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -1998,7 +1997,7 @@ function DealRoomsPage({ rooms, activeRoom, users, requests, posts, setActiveDea
                 <Button variant="danger" onClick={() => closeDeal(activeRoom.id, true)}>Cancelar</Button>
               </div>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="grid gap-3 md:grid-cols-4">
               <Metric icon={UserRound} label="Comprador" value={activeRoom.buyerClient || "-"} />
               <Metric icon={CircleDollarSign} label="Comissao" value={money(activeRoom.commissionAgreed)} />
               <Metric icon={Handshake} label="Partilha" value={`${activeRoom.sharePercentage || 0}%`} />
@@ -2017,7 +2016,7 @@ function DealRoomsPage({ rooms, activeRoom, users, requests, posts, setActiveDea
                   <div className="mb-3 grid max-h-72 gap-2 overflow-auto">
                     {activeRoom.messages?.map((item) => <p key={item.id} className="rounded bg-black/20 p-2 text-sm"><b>{item.sender?.name || "User"}:</b> {item.body}</p>)}
                   </div>
-                  <form className="grid gap-2 sm:flex" onSubmit={async (event) => { event.preventDefault(); await sendDealMessage(activeRoom.id, message); setMessage(""); }}>
+                  <form className="flex gap-2" onSubmit={async (event) => { event.preventDefault(); await sendDealMessage(activeRoom.id, message); setMessage(""); }}>
                     <TextInput value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Mensagem da deal room" />
                     <Button><Send size={16} /></Button>
                   </form>
@@ -2046,7 +2045,7 @@ function GroupsPage({ groups, activeGroup, setActiveGroupId, joinGroup, createGr
   const [message, setMessage] = useState("");
   const isLegalGroup = activeGroup?.name?.toLowerCase().includes("jurid");
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(260px,300px)_minmax(0,1fr)]">
+    <div className="grid gap-4 lg:grid-cols-[300px_1fr]">
       <Panel className="h-fit p-4">
         <h1 className="mb-4 font-semibold">Grupos profissionais</h1>
         <div className="grid gap-2">
@@ -2062,8 +2061,8 @@ function GroupsPage({ groups, activeGroup, setActiveGroupId, joinGroup, createGr
         {activeGroup ? (
           <div className="grid gap-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
-              <div><h1 className="text-xl font-semibold sm:text-2xl">{activeGroup.name}</h1><p className="text-nexus-muted">{activeGroup.description}</p></div>
-              <div className="grid gap-2 sm:flex"><Button variant="ghost" onClick={() => joinGroup(activeGroup.id)}>{activeGroup.joined ? "Sair" : "Entrar"}</Button><Button onClick={() => createGroupPost(activeGroup.id)}><Plus size={16} /> Publicar</Button></div>
+              <div><h1 className="text-2xl font-semibold">{activeGroup.name}</h1><p className="text-nexus-muted">{activeGroup.description}</p></div>
+              <div className="flex gap-2"><Button variant="ghost" onClick={() => joinGroup(activeGroup.id)}>{activeGroup.joined ? "Sair" : "Entrar"}</Button><Button onClick={() => createGroupPost(activeGroup.id)}><Plus size={16} /> Publicar</Button></div>
             </div>
             <div className="grid gap-4 xl:grid-cols-[1fr_340px]">
               <div className="grid gap-3">
@@ -2077,7 +2076,7 @@ function GroupsPage({ groups, activeGroup, setActiveGroupId, joinGroup, createGr
                   <div className="mb-3 grid max-h-72 gap-2 overflow-auto">
                     {activeGroup.messages?.map((item) => <p key={item.id} className="rounded bg-black/20 p-2 text-sm">{item.body}</p>)}
                   </div>
-                  <form className="grid gap-2 sm:flex" onSubmit={async (event) => { event.preventDefault(); await sendGroupMessage(activeGroup.id, message); setMessage(""); }}>
+                  <form className="flex gap-2" onSubmit={async (event) => { event.preventDefault(); await sendGroupMessage(activeGroup.id, message); setMessage(""); }}>
                     <TextInput value={message} onChange={(event) => setMessage(event.target.value)} placeholder="Mensagem para o grupo" />
                     <Button><Send size={16} /></Button>
                   </form>
@@ -2140,7 +2139,7 @@ function MapPage({ posts, requests }) {
 
   return (
     <div className="grid gap-4">
-      <Panel className="grid gap-3 p-3 sm:grid-cols-2 sm:p-4 lg:grid-cols-4">
+      <Panel className="grid gap-3 p-4 md:grid-cols-4">
         <TextInput placeholder="Localizacao" value={filters.location} onChange={(event) => setFilters({ ...filters, location: event.target.value })} />
         <TextInput placeholder="Preco maximo" />
         <SelectInput value={filters.type} onChange={(event) => setFilters({ ...filters, type: event.target.value })}>
@@ -2180,7 +2179,7 @@ function CreateRequestModal({ onClose, onSubmit }) {
   return (
     <Modal title="Criar pedido de cliente" onClose={onClose}>
       <form className="grid gap-4" onSubmit={(event) => { event.preventDefault(); onSubmit(form); }}>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-3">
           <Field label="Tipo de negocio"><SelectInput value={form.businessType} onChange={(event) => setForm({ ...form, businessType: event.target.value })}>{businessTypes.map(([key, text]) => <option key={key} value={key}>{text}</option>)}</SelectInput></Field>
           <Field label="Tipo de imovel"><SelectInput value={form.propertyType} onChange={(event) => setForm({ ...form, propertyType: event.target.value })}>{propertyTypes.map(([key, text]) => <option key={key} value={key}>{text}</option>)}</SelectInput></Field>
           <Field label="Localizacao"><TextInput required value={form.location} onChange={(event) => setForm({ ...form, location: event.target.value })} /></Field>
@@ -2194,7 +2193,7 @@ function CreateRequestModal({ onClose, onSubmit }) {
           <Field label="Anexos opcionais"><TextInput type="file" multiple onChange={(event) => setForm({ ...form, attachments: event.target.files })} /></Field>
         </div>
         <Field label="Descricao do que o cliente procura"><TextArea required value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} /></Field>
-        <div className="grid gap-2 sm:flex sm:justify-end"><Button type="button" variant="ghost" onClick={onClose}>Cancelar</Button><Button><Plus size={16} /> Criar pedido</Button></div>
+        <div className="flex justify-end gap-2"><Button type="button" variant="ghost" onClick={onClose}>Cancelar</Button><Button><Plus size={16} /> Criar pedido</Button></div>
       </form>
     </Modal>
   );
@@ -2218,7 +2217,7 @@ function CreateDealRoomModal({ onClose, onSubmit, users, requests, posts, seed =
   return (
     <Modal title="Abrir deal room" onClose={onClose}>
       <form className="grid gap-4" onSubmit={(event) => { event.preventDefault(); onSubmit({ ...form, requiredDocs: form.requiredDocs.split(",").map((item) => item.trim()).filter(Boolean) }); }}>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-3">
           <Field label="Titulo do negocio"><TextInput required value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} /></Field>
           <Field label="Tipo de negocio"><SelectInput value={form.businessType} onChange={(event) => setForm({ ...form, businessType: event.target.value })}>{businessTypes.map(([key, text]) => <option key={key} value={key}>{text}</option>)}</SelectInput></Field>
           <Field label="Comprador/cliente"><TextInput value={form.buyerClient} onChange={(event) => setForm({ ...form, buyerClient: event.target.value })} /></Field>
@@ -2231,7 +2230,7 @@ function CreateDealRoomModal({ onClose, onSubmit, users, requests, posts, seed =
         </div>
         <Field label="Documentos necessarios"><TextInput value={form.requiredDocs} onChange={(event) => setForm({ ...form, requiredDocs: event.target.value })} /></Field>
         <Field label="Observacoes"><TextArea value={form.observations} onChange={(event) => setForm({ ...form, observations: event.target.value })} /></Field>
-        <div className="grid gap-2 sm:flex sm:justify-end"><Button type="button" variant="ghost" onClick={onClose}>Cancelar</Button><Button><BriefcaseBusiness size={16} /> Abrir deal room</Button></div>
+        <div className="flex justify-end gap-2"><Button type="button" variant="ghost" onClick={onClose}>Cancelar</Button><Button><BriefcaseBusiness size={16} /> Abrir deal room</Button></div>
       </form>
     </Modal>
   );
@@ -2259,7 +2258,7 @@ function EditPostModal({ post, onClose, onSubmit }) {
         <div className="rounded-md border border-nexus-gold/20 bg-nexus-gold/10 p-3 text-sm text-nexus-gold">
           ID da publicacao: <span className="font-mono">{post.id}</span>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-2">
           <Field label="Tipo de publicacao">
             <SelectInput value={form.type} onChange={(event) => setForm({ ...form, type: event.target.value })}>
               {postTypes.map(([key, text]) => <option key={key} value={key}>{text}</option>)}
@@ -2283,7 +2282,7 @@ function EditPostModal({ post, onClose, onSubmit }) {
         </div>
         <Field label="Descricao"><TextArea value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} /></Field>
         {!!previewImages.length && (
-        <div className="grid max-w-xs grid-cols-3 gap-2 sm:max-w-md sm:grid-cols-4">
+          <div className="grid max-w-md grid-cols-4 gap-2">
             {previewImages.slice(0, 4).map((image, index) => (
               <div key={`${image}-${index}`} className="aspect-square overflow-hidden rounded-md border border-white/10 bg-black/20">
                 <img src={mediaUrl(image)} alt="" className="h-full w-full object-cover" />
@@ -2296,7 +2295,7 @@ function EditPostModal({ post, onClose, onSubmit }) {
           <input type="file" multiple accept="image/*" className="hidden" onChange={(event) => setForm({ ...form, images: event.target.files })} />
         </label>
         <p className="text-xs text-nexus-muted">Se nao escolher novas fotos, as fotos atuais da publicacao continuam guardadas.</p>
-        <div className="grid gap-2 sm:flex sm:justify-end">
+        <div className="flex justify-end gap-2">
           <Button type="button" variant="ghost" onClick={onClose}>Cancelar</Button>
           <Button><Edit3 size={16} /> Guardar publicacao</Button>
         </div>
@@ -2341,15 +2340,15 @@ function EditProfileModal({ me, onClose, onSubmit }) {
     <Modal title="Editar perfil profissional" onClose={onClose}>
       <form className="grid gap-4" onSubmit={(event) => { event.preventDefault(); onSubmit({ ...form, profilePhotoFile, coverPhotoFile }); }}>
         <div className="overflow-hidden rounded-lg border border-white/10 bg-white/5">
-          <div className="relative h-28 bg-gradient-to-r from-[#0e2930] via-[#142f35] to-[#443a25] sm:h-36">
+          <div className="relative h-36 bg-gradient-to-r from-[#0e2930] via-[#142f35] to-[#443a25]">
             {coverPhotoPreview && <img src={mediaUrl(coverPhotoPreview)} alt="" className="h-full w-full object-cover" />}
             <label className="absolute bottom-3 right-3 cursor-pointer rounded-md border border-white/10 bg-black/45 px-3 py-2 text-sm font-semibold text-white hover:border-nexus-gold/60">
               Trocar capa
               <input type="file" accept="image/*" className="hidden" onChange={pickCoverPhoto} />
             </label>
           </div>
-          <div className="-mt-8 flex flex-col gap-4 p-4 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
-            <div className="flex items-end gap-3 sm:gap-4">
+          <div className="-mt-8 flex flex-wrap items-end justify-between gap-4 p-4">
+            <div className="flex items-end gap-4">
               <div className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-full border-4 border-[#07151d] bg-nexus-gold font-bold text-[#07151d]">
                 {profilePhotoPreview ? <img src={mediaUrl(profilePhotoPreview)} alt="" className="h-full w-full object-cover" /> : initials}
               </div>
@@ -2364,7 +2363,7 @@ function EditProfileModal({ me, onClose, onSubmit }) {
             <div className="rounded-md bg-black/20 px-3 py-2 font-mono text-xs text-nexus-gold">ID utilizador: {shortId(me.id)}</div>
           </div>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 md:grid-cols-2">
           <Field label="Nome"><TextInput value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} /></Field>
           <Field label="Empresa/agencia"><TextInput value={form.company} onChange={(event) => setForm({ ...form, company: event.target.value })} /></Field>
           <Field label="Localizacao"><TextInput value={form.location} onChange={(event) => setForm({ ...form, location: event.target.value })} /></Field>
@@ -2375,7 +2374,7 @@ function EditProfileModal({ me, onClose, onSubmit }) {
           <Field label="LinkedIn"><TextInput value={form.socialLinks.linkedin || ""} onChange={(event) => setForm({ ...form, socialLinks: { ...form.socialLinks, linkedin: event.target.value } })} /></Field>
         </div>
         <Field label="Bio profissional"><TextArea value={form.bio} onChange={(event) => setForm({ ...form, bio: event.target.value })} /></Field>
-        <div className="grid gap-2 sm:flex sm:justify-end"><Button type="button" variant="ghost" onClick={onClose}>Cancelar</Button><Button><Edit3 size={16} /> Guardar perfil</Button></div>
+        <div className="flex justify-end gap-2"><Button type="button" variant="ghost" onClick={onClose}>Cancelar</Button><Button><Edit3 size={16} /> Guardar perfil</Button></div>
       </form>
     </Modal>
   );
