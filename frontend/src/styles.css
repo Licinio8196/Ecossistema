@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --nexus-bg: #07151d;
+  --nexus-card: #10252b;
+  --nexus-panel: #16323a;
+  --nexus-gold: #d9b66f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-width: 0;
+  overflow-x: clip;
+}
+
+@supports not (overflow: clip) {
+  html,
+  body,
+  #root {
+    overflow-x: hidden;
+  }
+}
+
+#root {
+  min-height: 100vh;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #07151d;
+  color: #f4f7f5;
+  font-family: "Segoe UI", Aptos, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  min-width: 0;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+}
+
+.scrollbar-soft::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.scrollbar-soft {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(217, 182, 111, 0.34) transparent;
+}
+
+.scrollbar-soft::-webkit-scrollbar-thumb {
+  background: rgba(217, 182, 111, 0.34);
+  border-radius: 999px;
+}
+
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  min-height: clamp(360px, 64vh, 560px);
+  background: #10252b;
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: #10252b;
+  color: #f4f7f5;
+  border: 1px solid rgba(217, 182, 111, 0.28);
+}
+
+@media (max-width: 640px) {
+  .scrollbar-soft::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .leaflet-container {
+    min-height: 420px;
+  }
+}
