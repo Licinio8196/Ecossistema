@@ -21,16 +21,21 @@ const allowedOrigins = (process.env.CORS_ORIGIN || process.env.CLIENT_URL || "ht
 
 const corsOptions = {
   origin(origin, callback) {
-    // Allow server-to-server requests, curl/Postman, and same-origin requests with no Origin header.
     if (!origin) return callback(null, true);
 
-    if (allowedOrigins.includes("*") || allowedOrigins.includes(origin)) {
+    if (allowedOrigins.includes("*")) {
       return callback(null, true);
     }
 
-    return callback(new Error(`CORS blocked for origin: ${origin}`));
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(null, false);
   },
-  credentials: true
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: false
 };
 
 const io = new Server(server, {
