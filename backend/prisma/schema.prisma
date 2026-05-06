@@ -27,6 +27,7 @@ model User {
   invitedDealRooms  DealRoom[]         @relation("DealRoomInvited")
   dealMessages      DealRoomMessage[]
   dealTasks         DealRoomTask[]
+  dealMeetings      DealRoomMeeting[]
   groupMemberships  GroupMember[]
   groupPosts        GroupPost[]
   groupMessages     GroupMessage[]
@@ -181,11 +182,17 @@ model DealRoom {
   id               String             @id @default(cuid())
   title            String
   businessType     String
+  propertyType     String?
+  location         String?
+  estimatedPrice   Float?
   buyerClient      String?
   professionalName String?
   commissionAgreed Float?
+  commissionPercent Float?
+  commissionSplit  String?
   sharePercentage  Float?
   deadline         DateTime?
+  participantIds   String?
   requiredDocs     String?
   observations     String?
   status           String             @default("LEAD")
@@ -201,6 +208,7 @@ model DealRoom {
   messages         DealRoomMessage[]
   tasks            DealRoomTask[]
   documents        DealRoomDocument[]
+  meetings         DealRoomMeeting[]
 }
 
 model DealRoomMessage {
@@ -233,6 +241,25 @@ model DealRoomDocument {
   url        String
   uploadedAt DateTime @default(now())
   dealRoom   DealRoom @relation(fields: [dealRoomId], references: [id], onDelete: Cascade)
+}
+
+model DealRoomMeeting {
+  id           String   @id @default(cuid())
+  dealRoomId   String
+  title        String
+  type         String
+  date         String
+  time         String
+  duration     Int?
+  participants String?
+  meetLink     String?
+  description  String?
+  status       String   @default("SCHEDULED")
+  createdById  String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  dealRoom     DealRoom @relation(fields: [dealRoomId], references: [id], onDelete: Cascade)
+  createdBy    User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
 }
 
 model Group {

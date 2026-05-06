@@ -3,10 +3,14 @@ import path from "node:path";
 
 const required = [
   "package.json",
+  "index.html",
+  "client/src/App.jsx",
+  "client/src/main.jsx",
+  "client/src/styles.css",
   "server/src/index.js",
-  "server/scripts/apply-schema.js",
   "prisma/schema.prisma",
-  "prisma/seed.js"
+  "prisma/seed.js",
+  "README.md"
 ];
 
 const missing = required.filter((file) => !fs.existsSync(path.resolve(file)));

@@ -14,30 +14,37 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 const app = express();
 const server = http.createServer(app);
-const allowedOrigins = (process.env.CORS_ORIGIN || process.env.CLIENT_URL || "http://localhost:5173")
+
+const defaultClientOrigins = [
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  "https://ecossistema-chi.vercel.app"
+];
+const configuredClientOrigins = (process.env.CLIENT_URLS || process.env.CLIENT_URL || "")
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
+const allowedClientOrigins = new Set([...defaultClientOrigins, ...configuredClientOrigins]);
+
+function isAllowedClientOrigin(origin) {
+  if (!origin) return true;
+  if (allowedClientOrigins.has(origin)) return true;
+  try {
+    const { hostname } = new URL(origin);
+    return hostname === "localhost" || hostname === "127.0.0.1" || hostname.endsWith(".vercel.app");
+  } catch {
+    return false;
+  }
+}
 
 const corsOptions = {
   origin(origin, callback) {
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.includes("*")) {
-      return callback(null, true);
-    }
-
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-
-    return callback(null, false);
+    callback(null, isAllowedClientOrigin(origin));
   },
+  credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: false
+  allowedHeaders: ["Content-Type", "Authorization"]
 };
-
 const io = new Server(server, {
   cors: corsOptions
 });
@@ -57,7 +64,6 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
 app.use(express.json({ limit: "10mb" }));
 app.use("/uploads", express.static(uploadsDir));
 
@@ -81,6 +87,21 @@ function jsonText(value, fallback = []) {
     }
   }
   return JSON.stringify(value);
+}
+
+function parseJsonValue(value, fallback = []) {
+  if (value === undefined || value === null || value === "") return fallback;
+  if (Array.isArray(value) || typeof value === "object") return value;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return fallback;
+  }
+}
+
+function normalizeList(value) {
+  const parsed = parseJsonValue(value, value ? [value] : []);
+  return Array.isArray(parsed) ? parsed : [parsed].filter(Boolean);
 }
 
 function coerceNumber(value) {
@@ -146,12 +167,23 @@ const conversationInclude = {
   messages: { include: { sender: { include: { profile: true } } }, orderBy: { createdAt: "asc" } }
 };
 
+const dealRoomInclude = {
+  owner: { include: { profile: true } },
+  invitedUser: { include: { profile: true } },
+  messages: { include: { sender: { include: { profile: true } } }, orderBy: { createdAt: "asc" } },
+  tasks: { orderBy: { createdAt: "asc" } },
+  documents: { orderBy: { uploadedAt: "desc" } },
+  meetings: { include: { createdBy: { include: { profile: true } } }, orderBy: [{ date: "asc" }, { time: "asc" }] },
+  request: true
+};
+
 function isConversationParticipant(conversation, userId) {
   return conversation.userAId === userId || conversation.userBId === userId;
 }
 
 function isDealParticipant(dealRoom, userId, role) {
-  return role === "ADMIN" || dealRoom.ownerId === userId || dealRoom.invitedUserId === userId;
+  const participants = parseJsonValue(dealRoom.participantIds, []);
+  return role === "ADMIN" || dealRoom.ownerId === userId || dealRoom.invitedUserId === userId || participants.includes(userId);
 }
 
 async function createNotification(userId, type, title, body, link) {
@@ -159,6 +191,28 @@ async function createNotification(userId, type, title, body, link) {
   const notification = await prisma.notification.create({ data: { userId, type, title, body, link } });
   io.to(`user:${userId}`).emit("notification:new", notification);
   return notification;
+}
+
+function dealParticipantIds(room) {
+  return [...new Set([room.ownerId, room.invitedUserId, ...parseJsonValue(room.participantIds, [])].filter(Boolean))];
+}
+
+async function notifyDealParticipants(room, actorId, type, title, body) {
+  const recipients = dealParticipantIds(room).filter((id) => id !== actorId);
+  await Promise.all(recipients.map((userId) => createNotification(userId, type, title, body, `/deal-rooms/${room.id}`)));
+}
+
+async function withDealParticipants(room) {
+  if (!room) return room;
+  const ids = dealParticipantIds(room);
+  const participants = ids.length
+    ? await prisma.user.findMany({ where: { id: { in: ids } }, include: { profile: true } })
+    : [];
+  return {
+    ...room,
+    participantIds: jsonText(ids),
+    participants: participants.map(publicUser)
+  };
 }
 
 async function compatiblePosts(request) {
@@ -621,74 +675,101 @@ app.post("/api/messages", auth, nexusOnly, upload.array("attachments", 6), async
 });
 
 app.post("/api/deal-rooms", auth, nexusOnly, async (req, res) => {
+  const participantIds = [...new Set([...normalizeList(req.body.participantIds), ...normalizeList(req.body.participants)].filter(Boolean))];
+  const invitedUserId = req.body.invitedUserId || participantIds.find((id) => id !== req.user.id) || null;
   const dealRoom = await prisma.dealRoom.create({
     data: {
       title: req.body.title,
       businessType: req.body.businessType,
+      propertyType: req.body.propertyType || null,
+      location: req.body.location || null,
+      estimatedPrice: coerceNumber(req.body.estimatedPrice ?? req.body.price),
       buyerClient: req.body.buyerClient,
       professionalName: req.body.professionalName,
       commissionAgreed: coerceNumber(req.body.commissionAgreed),
+      commissionPercent: coerceNumber(req.body.commissionPercent),
+      commissionSplit: jsonText(req.body.commissionSplit || []),
       sharePercentage: coerceNumber(req.body.sharePercentage),
       deadline: coerceDate(req.body.deadline),
+      participantIds: jsonText(participantIds),
       requiredDocs: jsonText(req.body.requiredDocs || []),
-      observations: req.body.observations,
+      observations: req.body.observations || req.body.description,
+      status: req.body.status || "OPEN",
       ownerId: req.user.id,
-      invitedUserId: req.body.invitedUserId || null,
+      invitedUserId,
       propertyPostId: req.body.propertyPostId || null,
       requestId: req.body.requestId || null
     },
-    include: { owner: { include: { profile: true } }, invitedUser: { include: { profile: true } }, messages: true, tasks: true, documents: true }
+    include: dealRoomInclude
   });
-  if (dealRoom.invitedUserId) {
-    await createNotification(dealRoom.invitedUserId, "deal_invite", "Convite para deal room", `${req.user.name} convidou-te para ${dealRoom.title}.`, `/deal-rooms/${dealRoom.id}`);
-  }
-  res.status(201).json(dealRoom);
+  await Promise.all(
+    dealParticipantIds(dealRoom)
+      .filter((id) => id !== req.user.id)
+      .map((userId) => createNotification(userId, "deal_invite", "Convite para deal room", `${req.user.name} convidou-te para ${dealRoom.title}.`, `/deal-rooms/${dealRoom.id}`))
+  );
+  res.status(201).json(await withDealParticipants(dealRoom));
 });
 
 app.get("/api/deal-rooms", auth, nexusOnly, async (req, res) => {
   const rooms = await prisma.dealRoom.findMany({
-    where: req.user.role === "ADMIN" ? {} : { OR: [{ ownerId: req.user.id }, { invitedUserId: req.user.id }] },
-    include: { owner: { include: { profile: true } }, invitedUser: { include: { profile: true } }, messages: true, tasks: true, documents: true },
+    where: req.user.role === "ADMIN" ? {} : { OR: [{ ownerId: req.user.id }, { invitedUserId: req.user.id }, { participantIds: { contains: req.user.id } }] },
+    include: dealRoomInclude,
     orderBy: { updatedAt: "desc" }
   });
-  res.json(rooms);
+  res.json(await Promise.all(rooms.map(withDealParticipants)));
 });
 
 app.get("/api/deal-rooms/:id", auth, nexusOnly, async (req, res) => {
   const room = await prisma.dealRoom.findUnique({
     where: { id: req.params.id },
-    include: {
-      owner: { include: { profile: true } },
-      invitedUser: { include: { profile: true } },
-      messages: { include: { sender: { include: { profile: true } } }, orderBy: { createdAt: "asc" } },
-      tasks: true,
-      documents: true,
-      request: true
-    }
+    include: dealRoomInclude
   });
   if (!room) return res.status(404).json({ error: "Deal room nao encontrada." });
   if (!isDealParticipant(room, req.user.id, req.user.role)) return res.status(403).json({ error: "Deal room privada." });
-  res.json(room);
+  res.json(await withDealParticipants(room));
 });
 
 app.put("/api/deal-rooms/:id", auth, nexusOnly, async (req, res) => {
   const room = await prisma.dealRoom.findUnique({ where: { id: req.params.id } });
   if (!room) return res.status(404).json({ error: "Deal room nao encontrada." });
   if (!isDealParticipant(room, req.user.id, req.user.role)) return res.status(403).json({ error: "Deal room privada." });
+  const nextParticipantIds =
+    req.body.participantIds === undefined && req.body.participants === undefined
+      ? parseJsonValue(room.participantIds, [])
+      : [...new Set([...normalizeList(req.body.participantIds), ...normalizeList(req.body.participants)].filter(Boolean))];
   const updated = await prisma.dealRoom.update({
     where: { id: room.id },
     data: {
       title: req.body.title ?? room.title,
       status: req.body.status ?? room.status,
+      businessType: req.body.businessType ?? room.businessType,
+      propertyType: req.body.propertyType ?? room.propertyType,
+      location: req.body.location ?? room.location,
+      estimatedPrice: req.body.estimatedPrice === undefined ? room.estimatedPrice : coerceNumber(req.body.estimatedPrice),
       observations: req.body.observations ?? room.observations,
       invitedUserId: req.body.invitedUserId ?? room.invitedUserId,
       commissionAgreed: req.body.commissionAgreed === undefined ? room.commissionAgreed : coerceNumber(req.body.commissionAgreed),
-      sharePercentage: req.body.sharePercentage === undefined ? room.sharePercentage : coerceNumber(req.body.sharePercentage)
-    }
+      commissionPercent: req.body.commissionPercent === undefined ? room.commissionPercent : coerceNumber(req.body.commissionPercent),
+      commissionSplit: req.body.commissionSplit === undefined ? room.commissionSplit : jsonText(req.body.commissionSplit || []),
+      sharePercentage: req.body.sharePercentage === undefined ? room.sharePercentage : coerceNumber(req.body.sharePercentage),
+      participantIds: jsonText(nextParticipantIds)
+    },
+    include: dealRoomInclude
   });
-  const other = updated.ownerId === req.user.id ? updated.invitedUserId : updated.ownerId;
-  await createNotification(other, "deal_updated", "Negocio atualizado", `${req.user.name} atualizou ${updated.title}.`, `/deal-rooms/${updated.id}`);
-  res.json(updated);
+  await notifyDealParticipants(updated, req.user.id, "deal_updated", `Nova atividade na Deal Room ${updated.title}`, `${req.user.name} atualizou o negocio.`);
+  res.json(await withDealParticipants(updated));
+});
+
+app.get("/api/deal-rooms/:id/messages", auth, nexusOnly, async (req, res) => {
+  const room = await prisma.dealRoom.findUnique({ where: { id: req.params.id } });
+  if (!room) return res.status(404).json({ error: "Deal room nao encontrada." });
+  if (!isDealParticipant(room, req.user.id, req.user.role)) return res.status(403).json({ error: "Deal room privada." });
+  const messages = await prisma.dealRoomMessage.findMany({
+    where: { dealRoomId: room.id },
+    include: { sender: { include: { profile: true } } },
+    orderBy: { createdAt: "asc" }
+  });
+  res.json(messages);
 });
 
 app.post("/api/deal-rooms/:id/messages", auth, nexusOnly, async (req, res) => {
@@ -699,7 +780,10 @@ app.post("/api/deal-rooms/:id/messages", auth, nexusOnly, async (req, res) => {
     data: { dealRoomId: room.id, senderId: req.user.id, body: req.body.body },
     include: { sender: { include: { profile: true } } }
   });
+  await prisma.dealRoom.update({ where: { id: room.id }, data: { updatedAt: new Date() } });
+  await notifyDealParticipants(room, req.user.id, "deal_message", `Nova atividade na Deal Room ${room.title}`, `${req.user.name}: ${(req.body.body || "Nova mensagem").slice(0, 90)}`);
   io.to(`deal:${room.id}`).emit("deal-message:new", message);
+  dealParticipantIds(room).forEach((userId) => io.to(`user:${userId}`).emit("deal-message:new", message));
   res.status(201).json(message);
 });
 
@@ -710,16 +794,46 @@ app.post("/api/deal-rooms/:id/tasks", auth, nexusOnly, async (req, res) => {
   const task = await prisma.dealRoomTask.create({
     data: { dealRoomId: room.id, title: req.body.title, dueDate: coerceDate(req.body.dueDate), createdById: req.user.id }
   });
+  await prisma.dealRoom.update({ where: { id: room.id }, data: { updatedAt: new Date() } });
+  await notifyDealParticipants(room, req.user.id, "deal_task", `Nova atividade na Deal Room ${room.title}`, `${req.user.name} adicionou uma tarefa.`);
   res.status(201).json(task);
+});
+
+app.patch("/api/deal-rooms/:id/tasks/:taskId/status", auth, nexusOnly, async (req, res) => {
+  const room = await prisma.dealRoom.findUnique({ where: { id: req.params.id } });
+  if (!room) return res.status(404).json({ error: "Deal room nao encontrada." });
+  if (!isDealParticipant(room, req.user.id, req.user.role)) return res.status(403).json({ error: "Deal room privada." });
+  const existingTask = await prisma.dealRoomTask.findFirst({ where: { id: req.params.taskId, dealRoomId: room.id } });
+  if (!existingTask) return res.status(404).json({ error: "Tarefa nao encontrada." });
+  const task = await prisma.dealRoomTask.update({
+    where: { id: req.params.taskId },
+    data: { done: req.body.done === undefined ? true : Boolean(req.body.done) }
+  });
+  await prisma.dealRoom.update({ where: { id: room.id }, data: { updatedAt: new Date() } });
+  res.json(task);
+});
+
+app.get("/api/deal-rooms/:id/documents", auth, nexusOnly, async (req, res) => {
+  const room = await prisma.dealRoom.findUnique({ where: { id: req.params.id } });
+  if (!room) return res.status(404).json({ error: "Deal room nao encontrada." });
+  if (!isDealParticipant(room, req.user.id, req.user.role)) return res.status(403).json({ error: "Deal room privada." });
+  const documents = await prisma.dealRoomDocument.findMany({
+    where: { dealRoomId: room.id },
+    orderBy: { uploadedAt: "desc" }
+  });
+  res.json(documents);
 });
 
 app.post("/api/deal-rooms/:id/documents", auth, nexusOnly, upload.single("document"), async (req, res) => {
   const room = await prisma.dealRoom.findUnique({ where: { id: req.params.id } });
   if (!room) return res.status(404).json({ error: "Deal room nao encontrada." });
   if (!isDealParticipant(room, req.user.id, req.user.role)) return res.status(403).json({ error: "Deal room privada." });
+  if (!req.file) return res.status(400).json({ error: "Documento obrigatorio." });
   const document = await prisma.dealRoomDocument.create({
     data: { dealRoomId: room.id, title: req.body.title || req.file.originalname, url: `/uploads/${req.file.filename}` }
   });
+  await prisma.dealRoom.update({ where: { id: room.id }, data: { updatedAt: new Date() } });
+  await notifyDealParticipants(room, req.user.id, "deal_document", `Nova atividade na Deal Room ${room.title}`, `${req.user.name} enviou um documento.`);
   res.status(201).json(document);
 });
 
@@ -728,7 +842,93 @@ app.post("/api/deal-rooms/:id/close", auth, nexusOnly, async (req, res) => {
   if (!room) return res.status(404).json({ error: "Deal room nao encontrada." });
   if (!isDealParticipant(room, req.user.id, req.user.role)) return res.status(403).json({ error: "Deal room privada." });
   const updated = await prisma.dealRoom.update({ where: { id: room.id }, data: { status: req.body.lost ? "LOST" : "CLOSED" } });
+  await notifyDealParticipants(updated, req.user.id, "deal_updated", `Nova atividade na Deal Room ${updated.title}`, `${req.user.name} marcou o negocio como ${updated.status}.`);
   res.json(updated);
+});
+
+app.get("/api/deal-rooms/:id/meetings", auth, nexusOnly, async (req, res) => {
+  const room = await prisma.dealRoom.findUnique({ where: { id: req.params.id } });
+  if (!room) return res.status(404).json({ error: "Deal room nao encontrada." });
+  if (!isDealParticipant(room, req.user.id, req.user.role)) return res.status(403).json({ error: "Deal room privada." });
+  const meetings = await prisma.dealRoomMeeting.findMany({
+    where: { dealRoomId: room.id },
+    include: { createdBy: { include: { profile: true } } },
+    orderBy: [{ date: "asc" }, { time: "asc" }]
+  });
+  res.json(meetings);
+});
+
+app.post("/api/deal-rooms/:id/meetings", auth, nexusOnly, async (req, res) => {
+  const room = await prisma.dealRoom.findUnique({ where: { id: req.params.id } });
+  if (!room) return res.status(404).json({ error: "Deal room nao encontrada." });
+  if (!isDealParticipant(room, req.user.id, req.user.role)) return res.status(403).json({ error: "Deal room privada." });
+  const meeting = await prisma.dealRoomMeeting.create({
+    data: {
+      dealRoomId: room.id,
+      title: req.body.title,
+      type: req.body.type,
+      date: req.body.date,
+      time: req.body.time,
+      duration: coerceNumber(req.body.duration),
+      participants: jsonText(req.body.participants || []),
+      meetLink: req.body.meetLink,
+      description: req.body.description,
+      createdById: req.user.id
+    },
+    include: { createdBy: { include: { profile: true } } }
+  });
+  await prisma.dealRoom.update({ where: { id: room.id }, data: { updatedAt: new Date() } });
+  await notifyDealParticipants(room, req.user.id, "deal_meeting", `Nova atividade na Deal Room ${room.title}`, `${req.user.name} agendou uma chamada.`);
+  res.status(201).json(meeting);
+});
+
+app.put("/api/deal-rooms/:id/meetings/:meetingId", auth, nexusOnly, async (req, res) => {
+  const room = await prisma.dealRoom.findUnique({ where: { id: req.params.id } });
+  if (!room) return res.status(404).json({ error: "Deal room nao encontrada." });
+  if (!isDealParticipant(room, req.user.id, req.user.role)) return res.status(403).json({ error: "Deal room privada." });
+  const existingMeeting = await prisma.dealRoomMeeting.findFirst({ where: { id: req.params.meetingId, dealRoomId: room.id } });
+  if (!existingMeeting) return res.status(404).json({ error: "Chamada nao encontrada." });
+  const meeting = await prisma.dealRoomMeeting.update({
+    where: { id: req.params.meetingId },
+    data: {
+      title: req.body.title,
+      type: req.body.type,
+      date: req.body.date,
+      time: req.body.time,
+      duration: coerceNumber(req.body.duration),
+      participants: req.body.participants === undefined ? undefined : jsonText(req.body.participants || []),
+      meetLink: req.body.meetLink,
+      description: req.body.description
+    }
+  });
+  await notifyDealParticipants(room, req.user.id, "deal_meeting", `Nova atividade na Deal Room ${room.title}`, `${req.user.name} atualizou uma chamada.`);
+  res.json(meeting);
+});
+
+app.delete("/api/deal-rooms/:id/meetings/:meetingId", auth, nexusOnly, async (req, res) => {
+  const room = await prisma.dealRoom.findUnique({ where: { id: req.params.id } });
+  if (!room) return res.status(404).json({ error: "Deal room nao encontrada." });
+  if (!isDealParticipant(room, req.user.id, req.user.role)) return res.status(403).json({ error: "Deal room privada." });
+  const existingMeeting = await prisma.dealRoomMeeting.findFirst({ where: { id: req.params.meetingId, dealRoomId: room.id } });
+  if (!existingMeeting) return res.status(404).json({ error: "Chamada nao encontrada." });
+  await prisma.dealRoomMeeting.delete({ where: { id: req.params.meetingId } });
+  await notifyDealParticipants(room, req.user.id, "deal_meeting", `Nova atividade na Deal Room ${room.title}`, `${req.user.name} removeu uma chamada.`);
+  res.status(204).end();
+});
+
+app.patch("/api/deal-rooms/:id/meetings/:meetingId/status", auth, nexusOnly, async (req, res) => {
+  const room = await prisma.dealRoom.findUnique({ where: { id: req.params.id } });
+  if (!room) return res.status(404).json({ error: "Deal room nao encontrada." });
+  if (!isDealParticipant(room, req.user.id, req.user.role)) return res.status(403).json({ error: "Deal room privada." });
+  const existingMeeting = await prisma.dealRoomMeeting.findFirst({ where: { id: req.params.meetingId, dealRoomId: room.id } });
+  if (!existingMeeting) return res.status(404).json({ error: "Chamada nao encontrada." });
+  const meeting = await prisma.dealRoomMeeting.update({
+    where: { id: req.params.meetingId },
+    data: { status: req.body.status || "SCHEDULED" }
+  });
+  await prisma.dealRoom.update({ where: { id: room.id }, data: { updatedAt: new Date() } });
+  await notifyDealParticipants(room, req.user.id, "deal_meeting", `Nova atividade na Deal Room ${room.title}`, `${req.user.name} atualizou o estado de uma chamada.`);
+  res.json(meeting);
 });
 
 app.post("/api/groups", auth, nexusOnly, async (req, res) => {
@@ -821,6 +1021,9 @@ io.on("connection", async (socket) => {
   socket.on("group:join", (groupId) => socket.join(`group:${groupId}`));
   socket.on("typing", ({ conversationId, isTyping }) => {
     socket.to(`conversation:${conversationId}`).emit("typing", { userId: socket.user.id, isTyping });
+  });
+  socket.on("deal:typing", ({ dealRoomId, isTyping }) => {
+    socket.to(`deal:${dealRoomId}`).emit("deal:typing", { dealRoomId, userId: socket.user.id, name: socket.user.name, isTyping });
   });
 
   socket.on("disconnect", async () => {

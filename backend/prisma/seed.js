@@ -163,10 +163,17 @@ await prisma.dealRoom.create({
   data: {
     title: "Deal room: Chiado T3 para cliente internacional",
     businessType: "SALE",
+    propertyType: "APARTMENT",
+    location: "Lisboa",
+    estimatedPrice: 1450000,
     buyerClient: "Cliente relocation Londres",
     professionalName: professional.name,
     commissionAgreed: 43500,
+    commissionPercent: 3,
+    commissionSplit: JSON.stringify(["RESIMOVEL Prime 50%", "RESIMOVEL Lisboa 50%"]),
     sharePercentage: 50,
+    participantIds: JSON.stringify([professional.id]),
+    status: "NEGOTIATING",
     deadline: new Date(Date.now() + 1000 * 60 * 60 * 24 * 21),
     requiredDocs: JSON.stringify(["Caderneta predial", "Certificado energetico", "Licenca de utilizacao"]),
     observations: "Visita tecnica e proposta ate sexta-feira.",
@@ -178,6 +185,21 @@ await prisma.dealRoom.create({
       create: [
         { title: "Confirmar prova de fundos", createdById: premium.id },
         { title: "Agendar visita com cliente", createdById: premium.id }
+      ]
+    },
+    meetings: {
+      create: [
+        {
+          title: "Alinhamento inicial com cliente",
+          type: "Reuniao inicial",
+          date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2).toISOString().slice(0, 10),
+          time: "10:30",
+          duration: 45,
+          participants: JSON.stringify([premium.id, professional.id]),
+          meetLink: "https://meet.google.com/",
+          description: "Validar perfil do cliente, proximos passos e documentos.",
+          createdById: premium.id
+        }
       ]
     }
   }

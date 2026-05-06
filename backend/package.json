@@ -9,7 +9,7 @@
     "postinstall": "prisma generate",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
-    "db:push": "node server/scripts/apply-schema.js",
+    "db:push": "prisma db push --skip-generate",
     "seed": "node prisma/seed.js",
     "test": "node server/scripts/smoke-test.js"
   },

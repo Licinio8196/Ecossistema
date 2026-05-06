@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: ecossistema-backend
+    env: node
+    plan: free
+    buildCommand: npm install && npm run db:push && npm run seed
+    startCommand: npm start
+    envVars:
+      - key: DATABASE_URL
+        value: file:./prod.db
+      - key: CLIENT_URL
+        value: https://ecossistema-chi.vercel.app
+      - key: CLIENT_URLS
+        value: https://ecossistema-chi.vercel.app,http://localhost:5173
+      - key: JWT_SECRET
+        generateValue: true
